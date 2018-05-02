@@ -1,5 +1,6 @@
 //alert('ya valimos');
 window.onload = function () {
+	var actualTime;
 	//audio API
 	
 	//audiodevice
@@ -44,8 +45,7 @@ window.onload = function () {
 
 	document.body.appendChild(objElem);
 
-	webapis.avplay
-		.open('https://freeform.azureedge.net/showms/2018/96/ed13e7ee-4ace-465e-ade9-7fbe3623e93d.m3u8');
+	webapis.avplay.open('https://freeform.azureedge.net/showms/2018/96/ed13e7ee-4ace-465e-ade9-7fbe3623e93d.m3u8');
 	// webapis.avplay.open('https://www.w3schools.com/html/mov_bbb.mp4');
 
 	var listener = {
@@ -67,6 +67,7 @@ window.onload = function () {
 
 		oncurrentplaytime: function (currentTime) {
 			console.log('Current playtime: ' + currentTime);
+			actualTime = currentTime;
 		},
 
 		onerror: function (eventType) {
@@ -122,24 +123,19 @@ window.onload = function () {
 		console.log(e.keyCode);
 		switch (e.keyCode) {
 			case tvKey.VOL_UP: // 448
-				console.log(tizen.tvaudiocontrol.isMute());
-				console.log(tizen.tvaudiocontrol.getVolume());
-				console.log(tizen.tvaudiocontrol.toString());
-				console.log(tizen.tvaudiocontrol.setVolumeUp());
-				console.log(tizen.tvaudiocontrol.getVolume());
 //				if (tizen.tvaudiocontrol.getVolume() === 100) {
 //					console.log('volume 100');
 //				} else {
 //					tizen.tvaudiocontrol.setVolumeUp();
+//					console.log(tizen.tvaudiocontrol.getVolume());
 //				}
 				break;
 			case tvKey.VOL_DOWN: // 447
-				if (tizen.tvaudiocontrol.getVolume() === 0) {
-					console.log('volume 0');
-				} else {
-					tizen.tvaudiocontrol.setVolumeDown();
-				}
-				console.log('se ha bajado el volumen');
+//				if (tizen.tvaudiocontrol.getVolume() === 0) {
+//					console.log('volume 0');
+//				} else {
+//					tizen.tvaudiocontrol.setVolumeDown();
+//				}
 				break;
 			case tvKey.MUTE: // 449
 //				if (tizen.tvaudiocontrol.isMute()) {
@@ -169,21 +165,27 @@ window.onload = function () {
 				console.log('Right');
 				break;
 			case tvKey.REWIND: //412
+				webapis.avplay.jumpBackward(5000,successCallback,errorCallback);
 				console.log('Rewind');
 				break;
 			case tvKey.FASTFORWARD: //417
+				var newTime = actualTime + 5000;
+				console.log(actualTime);
+				console.log(newTime);
+				webapis.avplay.seekTo(newTime,successCallback,errorCallback);
 				console.log('Fastforward');
 				break;
 			case tvKey.STOP: //413
+				webapis.avplay.stop();
 				console.log('Stop');
 				break;
 			case tvKey.PLAY: // 415
-				console.log('Play');
 				webapis.avplay.play();
+				console.log('Play');
 				break;
 			case tvKey.PAUSE: // 19
-				console.log('Pause');
 				webapis.avplay.pause();
+				console.log('Pause');
 				break;
 			default:
 				console.log('no supported key');
