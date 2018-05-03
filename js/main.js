@@ -31,7 +31,6 @@ window.onload = function () {
 	objElem.style.width = '1920px';
 	objElem.style.height = '1080px';
 
-	document.body.appendChild(objElem);
 	document.getElementById('video_visible').appendChild(objElem);
 	document.getElementById('video_visible').style.display = 'none';
 	
