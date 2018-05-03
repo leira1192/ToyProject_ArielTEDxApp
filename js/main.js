@@ -1,40 +1,28 @@
 //alert('ya valimos');
 window.onload = function () {
+	var video_visible;
 	var actualTime;
-	//audio API
-	
-	//audiodevice
-//	var audiocontrol = deviceapis.audiocontrol;
-	var tvKey= {
-			VOL_UP: 448,
-			VOL_DOWN: 447,
-			MUTE: 449,
-			ENTER: 13,
-			RETURN: 10009,
-			EXIT: 10182,
-			UP: 38,
-			DOWN: 40,
-			LEFT: 37,
-			RIGHT: 39,
-			REWIND: 412,
-			FASTFORWARD: 417,
-			REC: 416,
-			PAUSE: 19,
-			PLAY: 415,
-			STOP: 413,
-		};
-	
+	var tvKey = {
+		VOL_UP: 448,
+		VOL_DOWN: 447,
+		MUTE: 449,
+		ENTER: 13,
+		RETURN: 10009,
+		EXIT: 10182,
+		UP: 38,
+		DOWN: 40,
+		LEFT: 37,
+		RIGHT: 39,
+		REWIND: 412,
+		FASTFORWARD: 417,
+		REC: 416,
+		PAUSE: 19,
+		PLAY: 415,
+		STOP: 413,
+	};
+
 	// define vars to detected keydown
 	var keys = {};
-//	var DEFAULT_KEYS = {
-//		'13': 'Enter',
-//		'37': 'ArrowLeft',
-//		'38': 'ArrowUp',
-//		'39': 'ArrowRight',
-//		'40': 'ArrowDown',
-//	};
-//	var UNSOPPORTED_KEY_CLASS = 'unsupported-key', INVISIBLE_KEY_CLASS = 'invisible', buttonNameEl = null, buttonCodeEl = null, waitingEl = null, pressedStatusEl = null;
-
 	console.log('hemos llegado hasta acá exitosamente');
 	var objElem = document.createElement('object');
 	objElem.type = 'application/avplayer';
@@ -44,10 +32,11 @@ window.onload = function () {
 	objElem.style.height = '1080px';
 
 	document.body.appendChild(objElem);
-
+	document.getElementById('video_visible').appendChild(objElem);
+	document.getElementById('video_visible').style.display = 'none';
+	
 	webapis.avplay.open('https://freeform.azureedge.net/showms/2018/96/ed13e7ee-4ace-465e-ade9-7fbe3623e93d.m3u8');
-	// webapis.avplay.open('https://www.w3schools.com/html/mov_bbb.mp4');
-
+	
 	var listener = {
 		onbufferingstart: function (percent) {
 			console.log('Buffering start.' + percent);
@@ -62,6 +51,7 @@ window.onload = function () {
 		},
 		onstreamcompleted: function () {
 			console.log('Stream Completed');
+			document.getElementById('video_visible').style.display = 'none';
 			webapis.avplay.stop();
 		},
 
@@ -95,7 +85,7 @@ window.onload = function () {
 
 	};
 
-	webapis.avplay.prepareAsync(successCallback, errorCallback);
+	webapis.avplay.prepareAsync(successCallback, errorCallback);	
 	registerKeys();
 	bindEvents();
 	// webapis.avplay.play();
@@ -109,7 +99,7 @@ window.onload = function () {
 				console.error('failed to register' + supportedKeys[i].name, e);
 			}
 			keys[supportedKeys[i].code] = supportedKeys[i].name;
-			console.log('registro ' + i + ': complete' + keys+ ',  keys storage: name:' + keys[supportedKeys[i].code]+ ', code: ' + supportedKeys[i].code);
+			console.log('registro ' + i + ': complete' + keys + ',  keys storage: name:' + keys[supportedKeys[i].code] + ', code: ' + supportedKeys[i].code);
 		}
 		console.log('keys registers');
 		for (var j = 0; j < keys.length; j++) {
@@ -123,28 +113,28 @@ window.onload = function () {
 		console.log(e.keyCode);
 		switch (e.keyCode) {
 			case tvKey.VOL_UP: // 448
-//				if (tizen.tvaudiocontrol.getVolume() === 100) {
-//					console.log('volume 100');
-//				} else {
-//					tizen.tvaudiocontrol.setVolumeUp();
-//					console.log(tizen.tvaudiocontrol.getVolume());
-//				}
+				//				if (tizen.tvaudiocontrol.getVolume() === 100) {
+				//					console.log('volume 100');
+				//				} else {
+				//					tizen.tvaudiocontrol.setVolumeUp();
+				//					console.log(tizen.tvaudiocontrol.getVolume());
+				//				}
 				break;
 			case tvKey.VOL_DOWN: // 447
-//				if (tizen.tvaudiocontrol.getVolume() === 0) {
-//					console.log('volume 0');
-//				} else {
-//					tizen.tvaudiocontrol.setVolumeDown();
-//				}
+				//				if (tizen.tvaudiocontrol.getVolume() === 0) {
+				//					console.log('volume 0');
+				//				} else {
+				//					tizen.tvaudiocontrol.setVolumeDown();
+				//				}
 				break;
 			case tvKey.MUTE: // 449
-//				if (tizen.tvaudiocontrol.isMute()) {
-//					tizen.tvaudiocontrol.setMute(false);
-//					console.log('no muted');
-//				} else {
-//					tizen.tvaudiocontrol.setMute(true);
-//					console.log('muted');
-//				}
+				//				if (tizen.tvaudiocontrol.isMute()) {
+				//					tizen.tvaudiocontrol.setMute(false);
+				//					console.log('no muted');
+				//				} else {
+				//					tizen.tvaudiocontrol.setMute(true);
+				//					console.log('muted');
+				//				}
 				break;
 			case tvKey.ENTER: // 13
 				console.log('Select');
@@ -165,23 +155,31 @@ window.onload = function () {
 				console.log('Right');
 				break;
 			case tvKey.REWIND: //412
-				webapis.avplay.jumpBackward(5000,successCallback,errorCallback);
+				webapis.avplay.jumpBackward(5000, successCallback, errorCallback);
 				console.log('Rewind');
 				break;
 			case tvKey.FASTFORWARD: //417
 				var newTime = actualTime + 5000;
 				console.log(actualTime);
 				console.log(newTime);
-				webapis.avplay.seekTo(newTime,successCallback,errorCallback);
+				webapis.avplay.seekTo(newTime, successCallback, errorCallback);
 				console.log('Fastforward');
 				break;
 			case tvKey.STOP: //413
-				webapis.avplay.stop();
-				console.log('Stop');
+				 if (document.getElementById('video_visible').style.display === 'block') {
+						document.getElementById('video_visible').style.display = 'none';
+					 	webapis.avplay.stop();
+					 	console.log('Play');
+					 } else {
+					 }
 				break;
 			case tvKey.PLAY: // 415
-				webapis.avplay.play();
-				console.log('Play');
+				 if (document.getElementById('video_visible').style.display === 'none') {
+					document.getElementById('video_visible').style.display = 'block';
+				 	webapis.avplay.play();
+				 	console.log('Play');
+				 } else {
+				 }
 				break;
 			case tvKey.PAUSE: // 19
 				webapis.avplay.pause();
