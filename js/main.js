@@ -114,7 +114,7 @@ window.onload = function () {
 		console.log('press key');
 		console.log(e.keyCode);
 		switch (e.keyCode) {
-			case tvKey.VOL_UP: // 448
+			case this.tvKey.VOL_UP: // 448
 				//				if (tizen.tvaudiocontrol.getVolume() === 100) {
 				//					console.log('volume 100');
 				//				} else {
@@ -122,14 +122,14 @@ window.onload = function () {
 				//					console.log(tizen.tvaudiocontrol.getVolume());
 				//				}
 				break;
-			case tvKey.VOL_DOWN: // 447
+			case this.tvKey.VOL_DOWN: // 447
 				//				if (tizen.tvaudiocontrol.getVolume() === 0) {
 				//					console.log('volume 0');
 				//				} else {
 				//					tizen.tvaudiocontrol.setVolumeDown();
 				//				}
 				break;
-			case tvKey.MUTE: // 449
+			case this.tvKey.MUTE: // 449
 				//				if (tizen.tvaudiocontrol.isMute()) {
 				//					tizen.tvaudiocontrol.setMute(false);
 				//					console.log('no muted');
@@ -138,10 +138,10 @@ window.onload = function () {
 				//					console.log('muted');
 				//				}
 				break;
-			case tvKey.ENTER: // 13
+			case this.tvKey.ENTER: // 13
 				console.log('Enter');
 				break;
-			case tvKey.RETURN: //10009
+			case this.tvKey.RETURN: //10009
 				var salir = confirm('Want to exit from this app?');
 				if (salir) {
 					window.tizen.application.getCurrentApplication().exit();
@@ -150,30 +150,30 @@ window.onload = function () {
 				}
 				console.log('return');
 				break;
-			case tvKey.UP: //38
+			case this.tvKey.UP: //38
 				console.log('Up');
 				break;
-			case tvKey.DOWN: //40
+			case this.tvKey.DOWN: //40
 				console.log('Down');
 				break;
-			case tvKey.LEFT: //37
+			case this.tvKey.LEFT: //37
 				console.log('Left');
 				break;
-			case tvKey.RIGHT: //39
+			case this.tvKey.RIGHT: //39
 				console.log('Right');
 				break;
-			case tvKey.REWIND: //412
+			case this.tvKey.REWIND: //412
 				webapis.avplay.jumpBackward(5000, successCallback, errorCallback);
 				console.log('Rewind');
 				break;
-			case tvKey.FASTFORWARD: //417
+			case this.tvKey.FASTFORWARD: //417
 				var newTime = actualTime + 5000;
 				console.log(actualTime);
 				console.log(newTime);
 				webapis.avplay.seekTo(newTime, successCallback, errorCallback);
 				console.log('Fastforward');
 				break;
-			case tvKey.STOP: //413
+			case this.tvKey.STOP: //413
 				if (document.getElementById('video_visible').style.display === 'block') {
 					document.getElementById('video_visible').style.display = 'none';
 					webapis.avplay.stop();
@@ -181,7 +181,7 @@ window.onload = function () {
 				} else {
 				}
 				break;
-			case tvKey.PLAY: // 415
+			case this.tvKey.PLAY: // 415
 				if (document.getElementById('video_visible').style.display === 'none') {
 					document.getElementById('video_visible').style.display = 'block';
 					webapis.avplay.play();
@@ -189,7 +189,7 @@ window.onload = function () {
 				} else {
 				}
 				break;
-			case tvKey.PAUSE: // 19
+			case this.tvKey.PAUSE: // 19
 				webapis.avplay.pause();
 				console.log('Pause');
 				break;
@@ -232,22 +232,22 @@ function loadApiContent(e) {
 			var content = JSON.parse(this.responseText);
 			var output = '';
 			content.forEach(function (elemento) {
-				output += 'ID: ' + elemento.id + '\n '
-					+ 'URL: ' + elemento.url + '\n '
-					+ 'NAME: ' + elemento.name + '\n '
-					+ 'SEASON: ' + elemento.season + '\n '
-					+ 'NUMBER: ' + elemento.number + '\n '
-					+ 'AIRDATE: ' + elemento.airdate + '\n '
-					+ 'AIRTIME: ' + elemento.airtime + '\n '
-					+ 'RUNTIME: ' + elemento.runtime + '\n '
-					+ 'IMAGE: ' + elemento.image.medium + '\n '
-					+ 'IMAGE: ' + elemento.image.original + '\n '
-					+ 'SUMMARY: ' + elemento.summary + '\n '
-					+ 'LINKS: ' + elemento._links.self.href + '\n ';
+				output += 'ID: ' + elemento.id + '\n '+
+				'URL: ' + elemento.url + '\n ' + 
+				'NAME: ' + elemento.name + '\n ' + 
+				'SEASON: ' + elemento.season + '\n ' + 
+				'NUMBER: ' + elemento.number + '\n ' + 
+				'AIRDATE: ' + elemento.airdate + '\n ' + 
+				'AIRTIME: ' + elemento.airtime + '\n ' + 
+				'RUNTIME: ' + elemento.runtime + '\n ' + 
+				'IMAGE: ' + elemento.image.medium + '\n ' + 
+				'IMAGE: ' + elemento.image.original + '\n ' + 
+				'SUMMARY: ' + elemento.summary + '\n ' + 
+				'LINKS: ' + elemento._links.self.href + '\n ';
 			});
 			console.log(this.responseText);
 			console.log(output);
 			console.log('llegamos al final del json');
 		}
-	}
+	};
 }
