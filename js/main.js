@@ -1,25 +1,28 @@
 //alert('ya valimos');
+loadApiContent();
+var window = {};
+
 window.onload = function () {
 	var video_visible;
 	var actualTime;
-	var tvKey = {
-		VOL_UP: 448,
-		VOL_DOWN: 447,
-		MUTE: 449,
-		ENTER: 13,
-		RETURN: 10009,
-		EXIT: 10182,
-		UP: 38,
-		DOWN: 40,
-		LEFT: 37,
-		RIGHT: 39,
-		REWIND: 412,
-		FASTFORWARD: 417,
-		REC: 416,
-		PAUSE: 19,
-		PLAY: 415,
-		STOP: 413,
-	};
+	// var tvKey = {
+	// 	VOL_UP: 448,
+	// 	VOL_DOWN: 447,
+	// 	MUTE: 449,
+	// 	ENTER: 13,
+	// 	RETURN: 10009,
+	// 	EXIT: 10182,
+	// 	UP: 38,
+	// 	DOWN: 40,
+	// 	LEFT: 37,
+	// 	RIGHT: 39,
+	// 	REWIND: 412,
+	// 	FASTFORWARD: 417,
+	// 	REC: 416,
+	// 	PAUSE: 19,
+	// 	PLAY: 415,
+	// 	STOP: 413,
+	// };
 
 	// define vars to detected keydown
 	var keys = {};
@@ -33,9 +36,9 @@ window.onload = function () {
 
 	document.getElementById('video_visible').appendChild(objElem);
 	document.getElementById('video_visible').style.display = 'none';
-	
+
 	webapis.avplay.open('https://freeform.azureedge.net/showms/2018/96/ed13e7ee-4ace-465e-ade9-7fbe3623e93d.m3u8');
-	
+
 	var listener = {
 		onbufferingstart: function (percent) {
 			console.log('Buffering start.' + percent);
@@ -84,7 +87,7 @@ window.onload = function () {
 
 	};
 
-	webapis.avplay.prepareAsync(successCallback, errorCallback);	
+	webapis.avplay.prepareAsync(successCallback, errorCallback);
 	registerKeys();
 	bindEvents();
 	// webapis.avplay.play();
@@ -136,9 +139,15 @@ window.onload = function () {
 				//				}
 				break;
 			case tvKey.ENTER: // 13
-				console.log('Select');
+				console.log('Enter');
 				break;
 			case tvKey.RETURN: //10009
+				var salir = confirm('Want to exit from this app?');
+				if (salir) {
+					window.tizen.application.getCurrentApplication().exit();
+				} else {
+					console.log('no vas a salir de este bucle infinito LOL :D');
+				}
 				console.log('return');
 				break;
 			case tvKey.UP: //38
@@ -165,20 +174,20 @@ window.onload = function () {
 				console.log('Fastforward');
 				break;
 			case tvKey.STOP: //413
-				 if (document.getElementById('video_visible').style.display === 'block') {
-						document.getElementById('video_visible').style.display = 'none';
-					 	webapis.avplay.stop();
-					 	console.log('Play');
-					 } else {
-					 }
+				if (document.getElementById('video_visible').style.display === 'block') {
+					document.getElementById('video_visible').style.display = 'none';
+					webapis.avplay.stop();
+					console.log('Stop');
+				} else {
+				}
 				break;
 			case tvKey.PLAY: // 415
-				 if (document.getElementById('video_visible').style.display === 'none') {
+				if (document.getElementById('video_visible').style.display === 'none') {
 					document.getElementById('video_visible').style.display = 'block';
-				 	webapis.avplay.play();
-				 	console.log('Play');
-				 } else {
-				 }
+					webapis.avplay.play();
+					console.log('Play');
+				} else {
+				}
 				break;
 			case tvKey.PAUSE: // 19
 				webapis.avplay.pause();
@@ -192,15 +201,53 @@ window.onload = function () {
 	}
 
 	function bindEvents() {
-		document.addEventListener('tizenhwkey', onDeviceHardwareKeyPress);
+		// document.addEventListener('tizenhwkey', onDeviceHardwareKeyPress);
 		window.addEventListener('keydown', onKeyDownPress);
 		console.log('online blind event');
 	}
 
-	function onDeviceHardwareKeyPress(e) {
-		if (e.keyName === 'back') {
-			Window.exit();
-		}
-	}
+	// function onDeviceHardwareKeyPress(e) {
+	// 	if (e.keyName === 'back') {
+	// 		Window.exit();
+	// 	}
+	// }
 
 };
+
+function loadApiContent(e) {
+	console.log('entramos al request');
+	var xhr = new XMLHttpRequest();
+	var url = 'http://api.tvmaze.com/shows/1/episodes';
+	xhr.onreadystatechange = function () {
+		if (this.readyState === 4 && this.status === 200) {
+			console.log('listo para hacer maravillas');
+		}
+	};
+	xhr.open('GET', url, true);
+	xhr.send();
+	console.log('se ha cargado el json?');
+	xhr.onload = function () {
+		if (this.status === 200) {
+			console.log('llegamos a la entrada del json');
+			var content = JSON.parse(this.responseText);
+			var output = '';
+			content.forEach(function (elemento) {
+				output += 'ID: ' + elemento.id + '\n '
+					+ 'URL: ' + elemento.url + '\n '
+					+ 'NAME: ' + elemento.name + '\n '
+					+ 'SEASON: ' + elemento.season + '\n '
+					+ 'NUMBER: ' + elemento.number + '\n '
+					+ 'AIRDATE: ' + elemento.airdate + '\n '
+					+ 'AIRTIME: ' + elemento.airtime + '\n '
+					+ 'RUNTIME: ' + elemento.runtime + '\n '
+					+ 'IMAGE: ' + elemento.image.medium + '\n '
+					+ 'IMAGE: ' + elemento.image.original + '\n '
+					+ 'SUMMARY: ' + elemento.summary + '\n '
+					+ 'LINKS: ' + elemento._links.self.href + '\n ';
+			});
+			console.log(this.responseText);
+			console.log(output);
+			console.log('llegamos al final del json');
+		}
+	}
+}
