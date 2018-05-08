@@ -4,6 +4,8 @@ var window = {};
 var video_visible;
 var actualTime;
 var keys = {};
+var content_api = [];
+var click_item_focus_testing = 0;
 var successCallback = function () {
 	console.log('successCallback its ok');
 };
@@ -15,8 +17,6 @@ window.onload = function () {
 	console.log('hemos llegado hasta acá exitosamente');
 	var objElem = document.createElement('object');
 	objElem.type = 'application/avplayer';
-	objElem.style.left = 100 + 'px';
-	objElem.style.top = 200 + 'px';
 	objElem.style.width = '1920px';
 	objElem.style.height = '1080px';
 	//Insert video object as a div child
@@ -101,6 +101,7 @@ function onKeyDownPress(e) {
 	console.log('press key');
 	console.log(e.keyCode);
 	switch (e.keyCode) {
+		// No es necesario controlar botones de volumen y mute
 		case this.tvKey.VOL_UP: // 448
 			//				if (tizen.tvaudiocontrol.getVolume() === 100) {
 			//					console.log('volume 100');
@@ -127,6 +128,7 @@ function onKeyDownPress(e) {
 			break;
 		case this.tvKey.ENTER: // 13
 			console.log('Enter');
+			loadinfo_actual(this.click_item_focus_testing);
 			break;
 		case this.tvKey.RETURN: //10009
 			var salir = confirm('Want to exit from this app?');
@@ -135,6 +137,7 @@ function onKeyDownPress(e) {
 				window.tizen.application.getCurrentApplication().exit();
 			} else {
 				console.log('no vas a salir de este bucle infinito LOL :D');
+				window.onload;
 			}
 			console.log('return');
 			break;
@@ -146,9 +149,23 @@ function onKeyDownPress(e) {
 			break;
 		case this.tvKey.LEFT: //37
 			console.log('Left');
+			if (this.click_item_focus_testing === 0) {
+				console.log('No hay más items a la izquierda');
+			} else {
+				click_item_focus_testing -= 1;
+				loadinfo_actual(this.click_item_focus_testing);
+				console.log('HTML actualizado');
+			}
 			break;
 		case this.tvKey.RIGHT: //39
 			console.log('Right');
+			if (this.click_item_focus_testing === this.content_api.length-1) {
+				console.log('No hay más items a la derecha');
+			} else {
+				click_item_focus_testing += 1;
+				loadinfo_actual(this.click_item_focus_testing);
+				console.log('HTML actualizado');
+			}
 			break;
 		case this.tvKey.REWIND: //412
 			webapis.avplay.jumpBackward(5000, successCallback, errorCallback);
@@ -168,6 +185,7 @@ function onKeyDownPress(e) {
 		case this.tvKey.STOP: //413
 			if (document.getElementById('video_visible').style.display === 'block') {
 				document.getElementById('video_visible').style.display = 'none';
+				document.getElementById('main_api').style.display = 'block';
 				webapis.avplay.stop();
 				console.log('Stop');
 			} else {
@@ -176,6 +194,7 @@ function onKeyDownPress(e) {
 		case this.tvKey.PLAY: // 415
 			if (document.getElementById('video_visible').style.display === 'none') {
 				document.getElementById('video_visible').style.display = 'block';
+				document.getElementById('main_api').style.display = 'none';
 				webapis.avplay.play();
 				console.log('Play');
 			} else {
@@ -208,24 +227,85 @@ function loadApiContent(e) {
 		if (this.status === 200) {
 			console.log('llegamos a la entrada del json');
 			var content = JSON.parse(this.responseText);
-			var output = '';
+			// var output = '';
 			content.forEach(function (elemento) {
-				output += 'ID: ' + elemento.id + '\n ' +
-					'URL: ' + elemento.url + '\n ' +
-					'NAME: ' + elemento.name + '\n ' +
-					'SEASON: ' + elemento.season + '\n ' +
-					'NUMBER: ' + elemento.number + '\n ' +
-					'AIRDATE: ' + elemento.airdate + '\n ' +
-					'AIRTIME: ' + elemento.airtime + '\n ' +
-					'RUNTIME: ' + elemento.runtime + '\n ' +
-					'IMAGE: ' + elemento.image.medium + '\n ' +
-					'IMAGE: ' + elemento.image.original + '\n ' +
-					'SUMMARY: ' + elemento.summary + '\n ' +
-					'LINKS: ' + elemento._links.self.href + '\n ';
+				var structure_api = {
+					id: '',
+					url: '',
+					name: '',
+					season: '',
+					number: '',
+					airdate: '',
+					airtime: '',
+					airstamp: '',
+					runtime: '',
+					image_medium: '',
+					image_original: '',
+					summary: '',
+					link_episode: ''
+				};
+				structure_api.id = elemento.id;
+				structure_api.url = elemento.url;
+				structure_api.name = elemento.name;
+				structure_api.season = elemento.season;
+				structure_api.number = elemento.number;
+				structure_api.airdate = elemento.airdate;
+				structure_api.airtime = elemento.airtime;
+				structure_api.airstamp = elemento.airstamp;
+				structure_api.runtime = elemento.runtime;
+				structure_api.image_medium = elemento.image.medium;
+				structure_api.image_original = elemento.image.original;
+				structure_api.summary = elemento.summary;
+				structure_api.link_episode = elemento._links.self.href;
+				this.content_api.push(structure_api);
+				// output += 'ID: ' + elemento.id + '\n ' +
+				// 	'URL: ' + elemento.url + '\n ' +
+				// 	'NAME: ' + elemento.name + '\n ' +
+				// 	'SEASON: ' + elemento.season + '\n ' +
+				// 	'NUMBER: ' + elemento.number + '\n ' +
+				// 	'AIRDATE: ' + elemento.airdate + '\n ' +
+				// 	'AIRTIME: ' + elemento.airtime + '\n ' +
+				// 	'RUNTIME: ' + elemento.runtime + '\n ' +
+				// 	'IMAGE: ' + elemento.image.medium + '\n ' +
+				// 	'IMAGE: ' + elemento.image.original + '\n ' +
+				// 	'SUMMARY: ' + elemento.summary + '\n ' +
+				// 	'LINKS: ' + elemento._links.self.href + '\n ';
 			});
 			console.log(this.responseText);
-			console.log(output);
+			console.log(content_api);
 			console.log('llegamos al final del json');
+			print_api_structure();
 		}
 	};
+}
+
+function print_api_structure() {
+	for (var i = 0; i < content_api.length; i++) {
+		console.log(content_api[i]);
+	}
+	console.log(' veamos si puede imprimir variables ${content_api[0].name}');
+	console.log(`veamos si puede imprimir variables ${content_api[0].name}`);
+}
+
+function loadinfo_actual(item_focus) {
+	console.log(content_api[item_focus].name);
+	document.getElementById('main_info_name').innerHTML = content_api[item_focus].name;
+	document.getElementById('main_info_season_chapter').innerHTML = 'Season: ' + content_api[item_focus].season + ' Chapter: ' + content_api[item_focus].number;
+	document.getElementById('main_info_aditional').innerHTML = '     Duration: ' + content_api[item_focus].runtime + 'Aviable: ' + content_api[item_focus].airdate;
+	document.getElementById('main_info_summary').innerHTML = 'Summary </br>' + content_api[item_focus].summary;
+	var setBackground_ = 'url(\'';
+	setBackground_ += content_api[item_focus].image_original;
+	setBackground_ += '\')';
+	console.log(setBackground_);
+	document.getElementById('main_api').style.backgroundImage = setBackground_;
+	// var item_focus_info = document.getElementById('main_info');
+	// item_focus_info.style.color = '#FFFFFF';
+	// var html_change = `
+	// <h1>Under The Dome</h1></br>
+	// <h2>${content_api[item_focus].name}</h2>
+	// <h4>Chapter: ${content_api[item_focus].number} </br>
+	// Season: ${content_api[item_focus].season}</h4> </br>`;
+	// console.log(html_change);
+	// item_focus_info.appendChild(html_change);
+	console.log('exito');
 }
